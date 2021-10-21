@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Sample App</string>
+
+    <string name="rates_list_empty">There are no rates available</string>
+
+    <string name="transaction_list_empty">There are no transactions for now</string>
+    <string name="transaction_list_refresh">Refresh</string>
+
+    <string name="transaction_details_title">Transaction Details</string>
+    <string name="transaction_details_sku">SKU</string>
+    <string name="transaction_details_original_amount">Original Amount</string>
+    <string name="transaction_details_converted_amount">Converted Amount</string>
+    <string name="transaction_details_total_amount">TOTAL: %1$s %2$s</string>
+    <string name="transaction_details_empty_list">No available data</string>
+    <string name="transaction_details_conversion_error">Some transactions could not be converted to the selected currency and they are not shown in the transaction details list</string>
+    <string name="transaction_details_show_rates">Rate Conversion</string>
+
+    <string name="okay">Okay</string>
+
+    <string name="close_app_title">Close App?</string>
+    <string name="close_app_confirmation_message">Do you really want to close this amazing app?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="amount_with_currency">%1$s %2$s</string>
+
+    <string name="error_title">Something went wrong…</string>
+</resources>
