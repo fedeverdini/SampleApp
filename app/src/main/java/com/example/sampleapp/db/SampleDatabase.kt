@@ -9,13 +9,15 @@ import com.example.sampleapp.db.converters.DateConverter
 import com.example.sampleapp.db.converters.RatesConverter
 import com.example.sampleapp.db.converters.TransactionsConverter
 import com.example.sampleapp.model.rate.RateListResponse
-import com.example.sampleapp.model.transaction.TransactionListResponse
+import com.example.sampleapp.ui.transaction.view.ProductView
+import com.example.sampleapp.ui.transaction.view.TransactionDetailsView
 
-@Database(entities = [TransactionListResponse::class, RateListResponse::class], version = 1, exportSchema = false)
+@Database(entities = [TransactionDetailsView::class, RateListResponse::class, ProductView::class], version = 1, exportSchema = false)
 @TypeConverters(TransactionsConverter::class, RatesConverter::class, DateConverter::class)
 abstract class SampleDatabase : RoomDatabase() {
-    abstract fun transactionListDao(): TransactionListDao
     abstract fun rateListDao(): RateListDao
+    abstract fun productListDao(): ProductsDao
+    abstract fun transactionDetailsDao(): TransactionDetailsDao
 
     companion object {
         fun buildDatabase(context: Context) =

@@ -7,9 +7,11 @@ import com.example.sampleapp.datasource.local.IProductsCache
 import com.example.sampleapp.datasource.local.ProductsCache
 import com.example.sampleapp.datasource.remote.ProductsApi
 import com.example.sampleapp.db.RateListDao
-import com.example.sampleapp.db.TransactionListDao
+import com.example.sampleapp.db.ProductsDao
 import com.example.sampleapp.db.SampleDatabase
+import com.example.sampleapp.db.TransactionDetailsDao
 import com.example.sampleapp.network.retrofit.RetrofitFactory
+import com.example.sampleapp.ui.splash.SplashViewModel
 import com.example.sampleapp.ui.transaction.details.TransactionDetailsViewModel
 import com.example.sampleapp.ui.transaction.list.TransactionListViewModel
 import com.example.sampleapp.ui.transaction.rates.RateListViewModel
@@ -35,13 +37,13 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val utilsModule = module {
-    single<INetworkUtils> { NetworkUtils() }
-    single<IEncryptUtils> { EncryptUtils() }
     single<IDateUtils> { DateUtils() }
     single<IStringUtils> { StringUtils() }
+    single<IAmountUtils> { AmountUtils() }
+    single<INetworkUtils> { NetworkUtils() }
+    single<IEncryptUtils> { EncryptUtils() }
     single<IViewPagerUtils> { ViewPagerUtils() }
     single<IPreferenceUtils> { PreferenceUtils(get()) }
-    single<IAmountUtils> { AmountUtils() }
 }
 
 val databaseModule = module {
@@ -53,13 +55,18 @@ val databaseModule = module {
         return database.rateListDao()
     }
 
-    fun provideTransactionListViewDao(database: SampleDatabase): TransactionListDao {
-        return database.transactionListDao()
+    fun provideProductListDao(database: SampleDatabase): ProductsDao {
+        return database.productListDao()
+    }
+
+    fun provideTransactionDetailsDao(database: SampleDatabase): TransactionDetailsDao {
+        return database.transactionDetailsDao()
     }
 
     single { provideDatabase(androidApplication()) }
     single { provideRateListDao(get()) }
-    single { provideTransactionListViewDao(get()) }
+    single { provideProductListDao(get()) }
+    single { provideTransactionDetailsDao(get()) }
 }
 
 val apiModule = module {
@@ -70,32 +77,25 @@ val apiModule = module {
 
 val cacheModule = module {
     factory<IProductsCache> {
-        ProductsCache(get(), get())
+        ProductsCache(get(), get(), get())
     }
 }
 
 val repoModule = module {
-    factory<IProductRepo> {
-        ProductRepo(get(), get())
-    }
+    factory<IProductRepo> { ProductRepo(get(), get()) }
 }
 
 val useCaseModule = module {
     factory<IGetRateListUseCase> { GetRateListUseCase(get()) }
-    factory<IGetTransactionListUseCase> { GetTransactionListUseCase(get()) }
+    factory<IGetProductListUseCase> { GetProductListUseCase(get()) }
+    factory<IGetTotalAmountUseCase> { GetTotalAmountUseCase(get()) }
+    factory<IGetTransactionListUseCase> { GetTransactionListUseCase(get(), get(), get()) }
     factory<IGetTransactionDetailsUseCase> { GetTransactionDetailsUseCase(get()) }
 }
 
 val viewModelsModule = module {
-    viewModel {
-        TransactionListViewModel(get(), Dispatchers)
-    }
-
-    viewModel {
-        TransactionDetailsViewModel(get(), get(), Dispatchers)
-    }
-
-    viewModel {
-        RateListViewModel(get(), Dispatchers)
-    }
+    viewModel { RateListViewModel(get(), Dispatchers) }
+    viewModel { TransactionListViewModel(get(), Dispatchers) }
+    viewModel { SplashViewModel(get(), get(), get(), Dispatchers) }
+    viewModel { TransactionDetailsViewModel(get(), get(), Dispatchers) }
 }

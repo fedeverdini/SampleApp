@@ -3,6 +3,7 @@ package com.example.sampleapp.db.converters
 import androidx.room.TypeConverter
 import com.example.sampleapp.model.transaction.Transaction
 import com.example.sampleapp.model.transaction.TransactionListResponse
+import com.example.sampleapp.ui.transaction.view.TransactionDetailsView
 import com.google.gson.Gson
 import java.util.*
 
@@ -28,4 +29,10 @@ class TransactionsConverter {
 
     @TypeConverter
     fun fromJsonToTransaction(value: String) = Gson().fromJson(value, Transaction::class.java)
+
+    @TypeConverter
+    fun fromTransactionsDetailViewToJson(value: TransactionDetailsView): String = Gson().toJson(value)
+
+    @TypeConverter
+    fun fromJsonToTransactionDetailsView(value: String) = Gson().fromJson(value, TransactionDetailsView::class.java)
 }

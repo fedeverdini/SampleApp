@@ -17,6 +17,10 @@
 
     <string name="okay">Okay</string>
 
+    <string name="splash_app_name">Sample App</string>
+    <string name="splash_author">by Federico Verdini</string>
+    <string name="splash_start">Start</string>
+
     <string name="close_app_title">Close App?</string>
     <string name="close_app_confirmation_message">Do you really want to close this amazing app?</string>
     <string name="yes">Yes</string>

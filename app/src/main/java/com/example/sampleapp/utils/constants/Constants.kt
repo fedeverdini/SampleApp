@@ -7,4 +7,7 @@ object Constants {
     const val TEST_SOCKET_TIMEOUT = 1500
     const val TEST_SOCKET_ADDRESS = "8.8.8.8"
     const val TEST_SOCKET_PORT = 53
+
+    const val TRANSACTION_DETAILS_PAGE_SIZE = 20
+    const val PRODUCT_LIST_PAGE_SIZE = 20
 }

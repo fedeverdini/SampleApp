@@ -8,19 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sampleapp.R
-import com.example.sampleapp.enum.Currency
 import com.example.sampleapp.model.DataEvent
 import com.example.sampleapp.model.error.BaseError
-import com.example.sampleapp.model.rate.Rate
 import com.example.sampleapp.ui.main.ErrorDialogFragment
 import com.example.sampleapp.ui.main.MainActivity
 import com.example.sampleapp.ui.transaction.list.TransactionListFragment
 import com.example.sampleapp.ui.transaction.rates.RateListFragment
-import com.example.sampleapp.ui.transaction.view.TransactionDetailsListView
 import com.example.sampleapp.ui.transaction.view.TransactionDetailsView
 import com.example.sampleapp.utils.amount.IAmountUtils
 import com.example.sampleapp.utils.extension.DoubleExtension.format
-import kotlinx.android.synthetic.main.main_activity.*
+import com.example.sampleapp.utils.preferences.IPreferenceUtils
+import com.example.sampleapp.utils.preferences.PreferenceUtils
 import kotlinx.android.synthetic.main.transaction_details_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -31,15 +29,18 @@ class TransactionDetailsFragment(private val sku: String) : Fragment() {
     private val transactionDetailsViewModel: TransactionDetailsViewModel by viewModel()
 
     private val amountUtils: IAmountUtils by inject()
+    private val preferenceUtils: IPreferenceUtils by inject()
 
     private lateinit var adapter: TransactionDetailsAdapter
+
+    private var page = 0
 
     private val uiStateObserver = Observer<DataEvent<TransactionDetailsUiState>> { event ->
         event.getContentIfNotHandled()?.let { state ->
             when (state) {
                 TransactionDetailsUiState.Loading -> showLoading(true)
                 TransactionDetailsUiState.ShowEmptyList -> showEmptyList()
-                is TransactionDetailsUiState.GetRatesSuccess -> getTransactionDetails(state.result)
+                is TransactionDetailsUiState.SetTotal -> setTotal(state.amount)
                 is TransactionDetailsUiState.ShowTransactionDetails -> showTransactionDetails(state.result)
                 is TransactionDetailsUiState.ShowError -> showError(state.error)
             }
@@ -60,7 +61,8 @@ class TransactionDetailsFragment(private val sku: String) : Fragment() {
         setUpAdapter()
         setUpListeners()
 
-        transactionDetailsViewModel.getRates()
+        transactionDetailsViewModel.getTotalAmount(sku)
+        transactionDetailsViewModel.getTransactionDetails(sku, page)
     }
 
     private fun setUpAdapter() {
@@ -77,11 +79,8 @@ class TransactionDetailsFragment(private val sku: String) : Fragment() {
         }
     }
 
-    private fun getTransactionDetails(rates: List<Rate>) {
-        transactionDetailsViewModel.getTransactionDetails(sku, Currency.EUR, rates)
-    }
-
-    private fun setTotal(value: Double, currency: String) {
+    private fun setTotal(value: Double) {
+        val currency = preferenceUtils.getString(PreferenceUtils.FINAL_CURRENCY)
         total.text = String.format(
             getString(R.string.transaction_details_total_amount),
             amountUtils.roundToTwoDecimals(value).format(2),
@@ -89,17 +88,16 @@ class TransactionDetailsFragment(private val sku: String) : Fragment() {
         )
     }
 
-    private fun showTransactionDetails(details: TransactionDetailsListView) {
-        val list = details.transactions.toMutableList().apply { add(0, getHeaders()) }
+    private fun showTransactionDetails(transactions: List<TransactionDetailsView>) {
+        showLoading(false)
+
+        val list = transactions.toMutableList().apply { add(0, getHeaders()) }
         adapter.setTransactionItems(list)
 
-        if (details.conversionRateError) {
+        /*if (transactions.conversionRateError) {
             conversionErrorMessage.visibility = View.VISIBLE
-        }
+        }*/
 
-        setTotal(details.total, details.currency.name)
-
-        showLoading(false)
         rateButton.visibility = View.VISIBLE
     }
 
@@ -118,11 +116,11 @@ class TransactionDetailsFragment(private val sku: String) : Fragment() {
 
     private fun getHeaders(): TransactionDetailsView {
         return TransactionDetailsView(
-            getString(R.string.transaction_details_sku),
-            getString(R.string.transaction_details_original_amount),
-            0.0,
-            getString(R.string.transaction_details_converted_amount),
-            0.0
+            sku = getString(R.string.transaction_details_sku),
+            originalCurrency = getString(R.string.transaction_details_original_amount),
+            originalAmount = 0.0,
+            finalCurrency = getString(R.string.transaction_details_converted_amount),
+            finalAmount = 0.0
         )
     }
 

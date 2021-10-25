@@ -6,41 +6,38 @@ import androidx.lifecycle.ViewModel
 import com.example.sampleapp.model.DataEvent
 import com.example.sampleapp.model.Resource.Status.SUCCESS
 import com.example.sampleapp.model.Resource.Status.ERROR
-import com.example.sampleapp.usecase.IGetTransactionListUseCase
+import com.example.sampleapp.usecase.IGetProductListUseCase
 import com.example.sampleapp.utils.errors.ErrorCode
 import com.example.sampleapp.utils.errors.ErrorUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 class TransactionListViewModel(
-    private val getTransactionList: IGetTransactionListUseCase,
+    private val getProductListUseCase: IGetProductListUseCase,
     dispatcher: Dispatchers
 ) : ViewModel() {
 
     private val ioScope = CoroutineScope(dispatcher.IO)
     private val mainScope = CoroutineScope(dispatcher.Main)
 
-    private val _uiState = MutableLiveData<DataEvent<TransactionListUiState>>()
-    val uiState: LiveData<DataEvent<TransactionListUiState>>
+    private val _uiState = MutableLiveData<DataEvent<ProductListUiState>>()
+    val uiState: LiveData<DataEvent<ProductListUiState>>
         get() = _uiState
 
-    fun getTransactionList(pullToRefresh: Boolean = false) {
+    fun getProductList(page: Int) {
         ioScope.launch {
             mainScope.launch {
-                _uiState.value = DataEvent(TransactionListUiState.Loading)
+                _uiState.value = DataEvent(ProductListUiState.Loading)
             }
 
-            val list = getTransactionList.getTransactionList(pullToRefresh)
+            val list = getProductListUseCase.getProductList(page)
             when (list.status) {
                 SUCCESS -> {
-                    var uiState: TransactionListUiState = TransactionListUiState.ShowEmptyList
+                    var uiState: ProductListUiState = ProductListUiState.ShowEmptyList
                     list.data?.let { transactionList ->
                         if (transactionList.isNotEmpty()) {
-                            uiState = TransactionListUiState.AddTransactionItems(transactionList)
+                            uiState = ProductListUiState.AddProductItems(transactionList)
                         }
                     }
 
@@ -52,7 +49,7 @@ class TransactionListViewModel(
                 ERROR -> {
                     mainScope.launch {
                         _uiState.value = DataEvent(
-                            TransactionListUiState.ShowError(
+                            ProductListUiState.ShowError(
                                 list.error ?: ErrorUtils.createError(ErrorCode.UNKNOWN)
                             )
                         )

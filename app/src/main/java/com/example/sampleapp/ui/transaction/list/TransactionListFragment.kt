@@ -22,13 +22,15 @@ class TransactionListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener
 
     private lateinit var adapter: TransactionListAdapter
 
-    private val uiStateObserver = Observer<DataEvent<TransactionListUiState>> { event ->
+    private var page = 0
+
+    private val uiStateObserver = Observer<DataEvent<ProductListUiState>> { event ->
         event.getContentIfNotHandled()?.let { state ->
             when (state) {
-                TransactionListUiState.Loading -> showLoading(true)
-                TransactionListUiState.ShowEmptyList -> showEmptyList()
-                is TransactionListUiState.AddTransactionItems -> showTransactionList(state.result.toList())
-                is TransactionListUiState.ShowError -> showError(state.error)
+                ProductListUiState.Loading -> showLoading(true)
+                ProductListUiState.ShowEmptyList -> showEmptyList()
+                is ProductListUiState.AddProductItems -> showTransactionList(state.result.toList())
+                is ProductListUiState.ShowError -> showError(state.error)
             }
         }
     }
@@ -48,19 +50,14 @@ class TransactionListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener
         setListeners()
         setUpAdapter()
 
-        viewModel.getTransactionList()
+        viewModel.getProductList(page)
     }
 
     override fun onRefresh() {
-        swipeToRefreshLayout.isRefreshing = false
-        viewModel.getTransactionList(pullToRefresh = true)
+        viewModel.getProductList(page)
     }
 
     private fun setListeners() {
-        swipeToRefreshLayout.setOnRefreshListener {
-            onRefresh()
-        }
-
         emptyListRefreshButton.setOnClickListener {
             onRefresh()
         }

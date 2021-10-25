@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.marvelapp"
+        applicationId "com.example.sampleapp"
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
@@ -89,6 +89,11 @@ dependencies {
 
     // Pagination
     implementation 'androidx.paging:paging-runtime:3.0.1'
+
+    // Worker manager
+    implementation("androidx.work:work-runtime-ktx:2.7.0")
+    implementation("androidx.concurrent:concurrent-futures:1.1.0")
+    implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
