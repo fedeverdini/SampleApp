@@ -12,7 +12,6 @@ import com.example.sampleapp.model.Resource.Status.SUCCESS
 import com.example.sampleapp.model.Resource.Status.ERROR
 import com.example.sampleapp.model.rate.Rate
 import com.example.sampleapp.model.transaction.Transaction
-import com.example.sampleapp.ui.transaction.view.ProductView
 import com.example.sampleapp.ui.transaction.view.TransactionDetailsView
 import com.example.sampleapp.utils.amount.IAmountUtils
 import com.example.sampleapp.worker.SaveProductListWorker

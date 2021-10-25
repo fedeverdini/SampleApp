@@ -54,6 +54,7 @@ class TransactionListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener
     }
 
     override fun onRefresh() {
+        swipeToRefreshLayout.isRefreshing = false
         viewModel.getProductList(page)
     }
 
